@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Motors — Легендарные автомобили</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0d1117;
+            color: #e6edf3;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ========== АНИМАЦИЯ ДВИЖУЩЕЙСЯ МАШИНЫ ========== */
+        .animation-banner {
+            width: 100%;
+            height: 90px;
+            background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
+            border-bottom: 2px solid #30363d;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Дорога */
+        .road {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            width: 200%;
+            height: 4px;
+            background: repeating-linear-gradient(90deg, #facc15 0px, #facc15 50px, transparent 50px, transparent 100px);
+            animation: roadMove 0.5s linear infinite;
+        }
+
+        @keyframes roadMove {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-100px);
+            }
+        }
+
+        /* Мигающий фонарь */
+        .blinking-beacon {
+            position: absolute;
+            top: 12px;
+            left: 28%;
+            width: 12px;
+            height: 12px;
+            background: #ff3333;
+            border-radius: 50%;
+            animation: beaconBlink 0.7s ease-in-out infinite;
+            box-shadow: 0 0 25px #ff3333, 0 0 50px #ff3333;
+            z-index: 10;
+        }
+
+        .blinking-beacon.two {
+            left: 68%;
+            animation-delay: 0.35s;
+            width: 10px;
+            height: 10px;
+            background: #ff6666;
+        }
+
+        @keyframes beaconBlink {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.1;
+                transform: scale(0.6);
+            }
+        }
+
+        /* Сама машина */
+        .moving-car {
+            position: absolute;
+            bottom: 8px;
+            left: -160px;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            animation: drive 3.5s linear infinite;
+            z-index: 5;
+            filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.5));
+        }
+
+        .car-body {
+            width: 90px;
+            height: 38px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 8px 20px 4px 4px;
+            position: relative;
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
+        }
+
+        .car-body::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 50px;
+            width: 22px;
+            height: 16px;
+            background: #1a1a2e;
+            border-radius: 4px 8px 2px 2px;
+        }
+
+        .car-roof {
+            width: 40px;
+            height: 26px;
+            background: #e74c3c;
+            border-radius: 10px 10px 0 0;
+            margin-left: -8px;
+            align-self: flex-start;
+            margin-top: -8px;
+            z-index: -1;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+        }
+
+        .wheel {
+            width: 16px;
+            height: 16px;
+            background: #111;
+            border: 2px solid #666;
+            border-radius: 50%;
+            margin-top: 26px;
+            margin-left: -12px;
+            z-index: 2;
+            box-shadow: 0 0 5px #000;
+        }
+
+        @keyframes drive {
+            0% {
+                left: -160px;
+            }
+            100% {
+                left: 110%;
+            }
+        }
+
+        /* ========== КОНТЕЙНЕР ========== */
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* ========== ШАПКА ========== */
+        .header {
+            text-align: center;
+            padding: 40px 20px 30px;
+        }
+        .header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .header .accent {
+            color: #facc15;
+        }
+        .header .subtitle {
+            color: #8b949e;
+            font-size: 18px;
+            font-weight: 400;
+        }
+        .header .badge {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 8px 22px;
+            border: 1px solid #facc15;
+            color: #facc15;
+            font-size: 13px;
+            letter-spacing: 2px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        /* ========== ИНТРО ========== */
+        .intro {
+            max-width: 800px;
+            margin: 0 auto 50px;
+            text-align: center;
+            color: #8b949e;
+            font-size: 17px;
+            line-height: 1.9;
+        }
+
+        /* ========== КАРТОЧКИ МАШИН ========== */
+        .car-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .car-card {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 16px;
+            padding: 24px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .car-card:hover {
+            border-color: #facc15;
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.05);
+        }
+
+        .gallery {
+            flex: 1 1 380px;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .main-img {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+        }
+        .thumb-strip {
+            display: flex;
+            gap: 8px;
+        }
+        .thumb-strip img {
+            width: 32%;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid #21262d;
+            background: #0d1117;
+            transition: border-color 0.2s;
+        }
+        .thumb-strip img:hover {
+            border-color: #facc15;
+        }
+
+        .info {
+            flex: 1 1 320px;
+            min-width: 280px;
+        }
+        .info h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .info .year-tag {
+            display: inline-block;
+            background: #facc15;
+            color: #0d1117;
+            padding: 5px 14px;
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 20px;
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+        }
+        .info p {
+            color: #b0b8c4;
+            font-size: 15px;
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+        .highlight-box {
+            background: #1c2129;
+            border-left: 4px solid #facc15;
+            padding: 14px 16px;
+            margin: 14px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 14px;
+            color: #c9d1d9;
+        }
+        .highlight-box strong {
+            color: #facc15;
+        }
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .specs-grid div {
+            background: #1c2129;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #c9d1d9;
+        }
+        .specs-grid div span {
+            display: block;
+            color: #facc15;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        /* ========== ЗАКЛЮЧЕНИЕ ========== */
+        .conclusion {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .conclusion h3 {
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        .conclusion p {
+            color: #8b949e;
+            margin-bottom: 12px;
+            text-align: justify;
+            font-size: 15px;
+        }
+
+        /* ========== ИСТОЧНИКИ ========== */
+        .references {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 16px;
+            padding: 28px 30px;
+            margin-top: 30px;
+        }
+        .references h3 {
+            color: #fff;
+            font-size: 20px;
+            margin-bottom: 14px;
+        }
+        .references ol {
+            padding-left: 22px;
+            color: #8b949e;
+            font-size: 14px;
+        }
+        .references ol li {
+            margin-bottom: 8px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 24px;
+            font-size: 13px;
+            color: #484f58;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 30px;
+            }
+            .car-card {
+                flex-direction: column;
+            }
+            .gallery {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== АНИМИРОВАННЫЙ БАННЕР ========== -->
+    <div class="animation-banner">
+        <div class="road"></div>
+        <div class="blinking-beacon"></div>
+        <div class="blinking-beacon two"></div>
+        <div class="moving-car">
+            <div class="car-roof"></div>
+            <div class="car-body"></div>
+            <div class="wheel"></div>
+        </div>
+    </div>
+
+    <!-- ========== ОСНОВНОЙ КОНТЕНТ ========== -->
+    <div class="container">
+
+        <div class="header">
+            <h1>Premium <span class="accent">Motors</span></h1>
+            <div class="subtitle">Легенды мирового автопрома</div>
+            <div class="badge">ИНДИВИДУАЛЬНЫЙ ПРОЕКТ</div>
+        </div>
+
+        <p class="intro">
+            Четыре автомобиля, четыре истории успеха. От дерзких стартапов до гоночных чемпионатов — каждая из этих машин навсегда вошла в историю. Я собрал ключевые факты, технические особенности и причины, по которым они стали культовыми.
+        </p>
+
+        <div class="car-grid">
+
+            <!-- ===== DeLorean DMC-12 ===== -->
+            <div class="car-card">
+                <div class="gallery">
+                    <img class="main-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/DeLorean_DMC-12_%288215092573%29.jpg/800px-DeLorean_DMC-12_%288215092573%29.jpg" alt="DeLorean DMC-12" loading="lazy">
+                    <div class="thumb-strip">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/DeLorean_DMC-12_%288215092573%29.jpg/800px-DeLorean_DMC-12_%288215092573%29.jpg" alt="front" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/DeLorean_DMC-12_%2816892267539%29.jpg/800px-DeLorean_DMC-12_%2816892267539%29.jpg" alt="side" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/DeLorean_DMC-12_%288215094095%29.jpg/800px-DeLorean_DMC-12_%288215094095%29.jpg" alt="rear" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                    </div>
+                </div>
+                <div class="info">
+                    <h2>DeLorean DMC-12</h2>
+                    <div class="year-tag">1981 – 1983</div>
+                    <p>Созданный Джоном Делореаном, этот автомобиль прославился как машина времени из фильма «Назад в будущее». Кузов из неокрашенной нержавеющей стали и двери «крыло чайки» делают его мгновенно узнаваемым. Завод находился в Северной Ирландии, всего построено около 9000 экземпляров.</p>
+                    <div class="highlight-box"><strong>Факт:</strong> Царапины на кузове можно было убрать обычной шлифовкой — никакой покраски.</div>
+                    <div class="specs-grid">
+                        <div><span>Двигатель</span>PRV V6, 2.85 л</div>
+                        <div><span>Мощность</span>130 л.с.</div>
+                        <div><span>Разгон 0–100</span>10.5 с</div>
+                        <div><span>Макс. скорость</span>195 км/ч</div>
+                        <div><span>Привод</span>Задний</div>
+                        <div><span>Масса</span>1233 кг</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Ferrari Testarossa ===== -->
+            <div class="car-card">
+                <div class="gallery">
+                    <img class="main-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Ferrari_Testarossa_%E2%80%93_Frontansicht_%282%29%2C_25._August_2013%2C_D%C3%BCsseldorf.jpg/800px-Ferrari_Testarossa_%E2%80%93_Frontansicht_%282%29%2C_25._August_2013%2C_D%C3%BCsseldorf.jpg" alt="Ferrari Testarossa" loading="lazy">
+                    <div class="thumb-strip">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Ferrari_Testarossa_%E2%80%93_Frontansicht_%282%29%2C_25._August_2013%2C_D%C3%BCsseldorf.jpg/800px-Ferrari_Testarossa_%E2%80%93_Frontansicht_%282%29%2C_25._August_2013%2C_D%C3%BCsseldorf.jpg" alt="front" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Ferrari_Testarossa_%E2%80%93_Heckansicht_%282%29%2C_25._August_2013%2C_D%C3%BCsseldorf.jpg/800px-Ferrari_Testarossa_%E2%80%93_Heckansicht_%282%29%2C_25._August_2013%2C_D%C3%BCsseldorf.jpg" alt="rear" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Ferrari_Testarossa_-_Flickr_-_exfordy_%281%29.jpg/800px-Ferrari_Testarossa_-_Flickr_-_exfordy_%281%29.jpg" alt="side" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                    </div>
+                </div>
+                <div class="info">
+                    <h2>Ferrari Testarossa</h2>
+                    <div class="year-tag">1984 – 1996</div>
+                    <p>Икона 80-х с 12-цилиндровым оппозитным мотором. Название «красная голова» — отсылка к гоночным моторам Ferrari 50-х. Дизайн Pininfarina, знаменитые боковые «жабры» для охлаждения радиаторов и появление в сериале «Полиция Майами» сделали её суперзвездой.</p>
+                    <div class="highlight-box"><strong>Факт:</strong> Радиаторы перенесены назад для лучшей развесовки, а воздух подаётся через боковые каналы.</div>
+                    <div class="specs-grid">
+                        <div><span>Двигатель</span>Flat-12, 4.9 л</div>
+                        <div><span>Мощность</span>390 л.с.</div>
+                        <div><span>Разгон 0–100</span>5.2 с</div>
+                        <div><span>Макс. скорость</span>290 км/ч</div>
+                        <div><span>Привод</span>Задний</div>
+                        <div><span>Масса</span>1506 кг</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Toyota Supra Mk4 ===== -->
+            <div class="car-card">
+                <div class="gallery">
+                    <img class="main-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Toyota_Supra_Mk4_%E2%80%93_Frontansicht%2C_10._Mai_2018%2C_D%C3%BCsseldorf.jpg/800px-Toyota_Supra_Mk4_%E2%80%93_Frontansicht%2C_10._Mai_2018%2C_D%C3%BCsseldorf.jpg" alt="Toyota Supra" loading="lazy">
+                    <div class="thumb-strip">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Toyota_Supra_Mk4_%E2%80%93_Frontansicht%2C_10._Mai_2018%2C_D%C3%BCsseldorf.jpg/800px-Toyota_Supra_Mk4_%E2%80%93_Frontansicht%2C_10._Mai_2018%2C_D%C3%BCsseldorf.jpg" alt="front" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Toyota_Supra_Mk4_%E2%80%93_Heckansicht%2C_10._Mai_2018%2C_D%C3%BCsseldorf.jpg/800px-Toyota_Supra_Mk4_%E2%80%93_Heckansicht%2C_10._Mai_2018%2C_D%C3%BCsseldorf.jpg" alt="rear" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/1994_Toyota_Supra_SZ-R_%28JZA80%29_coupe_%282015-07-03%29_01.jpg/800px-1994_Toyota_Supra_SZ-R_%28JZA80%29_coupe_%282015-07-03%29_01.jpg" alt="side" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                    </div>
+                </div>
+                <div class="info">
+                    <h2>Toyota Supra Mk4</h2>
+                    <div class="year-tag">1993 – 2002</div>
+                    <p>Японская легенда с мотором 2JZ-GTE — рядная шестёрка с двумя турбинами и чугунным блоком. Мотор настолько прочен, что тюнеры форсируют его до 800+ л.с. без замены поршней. Задние фонари-бумеранги и кокпит вокруг водителя — визитная карточка.</p>
+                    <div class="highlight-box"><strong>Факт:</strong> По джентльменскому соглашению мощность занижалась до 276 л.с., реально — более 320 л.с.</div>
+                    <div class="specs-grid">
+                        <div><span>Двигатель</span>2JZ-GTE, 3.0 л</div>
+                        <div><span>Мощность</span>~320 л.с.</div>
+                        <div><span>Разгон 0–100</span>5.1 с</div>
+                        <div><span>Макс. скорость</span>250 км/ч</div>
+                        <div><span>Привод</span>Задний</div>
+                        <div><span>Масса</span>1510 кг</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== BMW M3 E30 ===== -->
+            <div class="car-card">
+                <div class="gallery">
+                    <img class="main-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/BMW_M3_%28E30%29_%E2%80%93_Frontansicht%2C_31._August_2013%2C_D%C3%BCsseldorf.jpg/800px-BMW_M3_%28E30%29_%E2%80%93_Frontansicht%2C_31._August_2013%2C_D%C3%BCsseldorf.jpg" alt="BMW M3 E30" loading="lazy">
+                    <div class="thumb-strip">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/BMW_M3_%28E30%29_%E2%80%93_Frontansicht%2C_31._August_2013%2C_D%C3%BCsseldorf.jpg/800px-BMW_M3_%28E30%29_%E2%80%93_Frontansicht%2C_31._August_2013%2C_D%C3%BCsseldorf.jpg" alt="front" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/BMW_M3_%28E30%29_%E2%80%93_Heckansicht%2C_31._August_2013%2C_D%C3%BCsseldorf.jpg/800px-BMW_M3_%28E30%29_%E2%80%93_Heckansicht%2C_31._August_2013%2C_D%C3%BCsseldorf.jpg" alt="rear" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/BMW_M3_%28E30%29_Sport_Evolution_%E2%80%93_Frontansicht%2C_10._Juni_2012%2C_D%C3%BCsseldorf.jpg/800px-BMW_M3_%28E30%29_Sport_Evolution_%E2%80%93_Frontansicht%2C_10._Juni_2012%2C_D%C3%BCsseldorf.jpg" alt="sport evo" loading="lazy" onclick="this.closest('.gallery').querySelector('.main-img').src=this.src">
+                    </div>
+                </div>
+                <div class="info">
+                    <h2>BMW M3 E30</h2>
+                    <div class="year-tag">1986 – 1991</div>
+                    <p>Первый M3, созданный для омологации в чемпионате DTM. Высокооборотный 4-цилиндровый мотор S14, расширенные крылья и плоское заднее стекло. Выиграл более 1500 гонок. Версия Sport Evolution имела 2.5-литровый мотор и регулируемый сплиттер.</p>
+                    <div class="highlight-box"><strong>Факт:</strong> Кузов практически не взаимозаменяем с обычной 3-й серией — всё ради аэродинамики.</div>
+                    <div class="specs-grid">
+                        <div><span>Двигатель</span>S14, 2.3 л</div>
+                        <div><span>Мощность</span>195–215 л.с.</div>
+                        <div><span>Разгон 0–100</span>6.9 с</div>
+                        <div><span>Макс. скорость</span>235 км/ч</div>
+                        <div><span>Привод</span>Задний</div>
+                        <div><span>Масса</span>1200 кг</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Заключение -->
+        <div class="conclusion">
+            <h3>Почему эти машины — легенды?</h3>
+            <p>
+                Все четыре автомобиля объединены смелостью инженерных решений. DeLorean — стартап, бросивший вызов гигантам, пусть и проигравший коммерчески. Testarossa — вершина итальянского дизайна и мотора Flat-12. Supra — доказательство, что японский мотор может быть крепче американского V8. M3 E30 — настоящий гоночный автомобиль, который можно было купить в салоне.
+            </p>
+            <p>
+                Сегодня это не просто машины — это артефакты эпохи, когда автомобили строили с душой и без компромиссов.
+            </p>
+        </div>
+
+        <!-- Источники -->
+        <div class="references">
+            <h3>Список использованных источников</h3>
+            <ol>
+                <li>Пол Холт. «История суперкаров 80-х» — М.: АвтоВек, 2005. — 312 с.</li>
+                <li>Журнал «За рулём», выпуск №7, 1995 г. Статья «Японский мускул: тест-драйв Toyota Supra».</li>
+                <li>Архив DTM 1987–1989, раздел омологации BMW M3 E30. motorsportarchiv.de</li>
+                <li>Руководство по ремонту двигателя PRV V6. Renault Alpine Club, Франция, 1990.</li>
+                <li>John Lamm. «Ferrari: A Complete Guide to All Models» — Motorbooks, 2008.</li>
+                <li>Изображения: Wikimedia Commons, лицензия Creative Commons.</li>
+            </ol>
+        </div>
+
+        <div class="footer">
+            © 2024 Premium Motors. Индивидуальный проект. Работа выполнена самостоятельно.
+        </div>
+
+    </div>
+</body>
+</html>
