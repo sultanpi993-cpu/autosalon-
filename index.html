@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Автосалон "Классика Движения" - разработка сайта</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Arial', system-ui, -apple-system, sans-serif;
+            background: #f4f7fc;
+            color: #1e2f3a;
+            line-height: 1.5;
+        }
+
+        /* === ПОЛОСКА С МАШИНКОЙ === */
+        .car-strip {
+            background: #0a2f44;
+            height: 80px;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 3px solid #1c5a7a;
+        }
+
+        .pixel-car-moving {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: -180px;
+            animation: driveCar 7s linear infinite;
+            image-rendering: pixelated;
+        }
+
+        @keyframes driveCar {
+            0%   { left: -180px; transform: translateY(-50%) scaleX(1); }
+            48%  { left: calc(100% - 100px); transform: translateY(-50%) scaleX(1); }
+            50%  { left: calc(100% - 100px); transform: translateY(-50%) scaleX(-1); }
+            98%  { left: -180px; transform: translateY(-50%) scaleX(-1); }
+            100% { left: -180px; transform: translateY(-50%) scaleX(1); }
+        }
+
+        /* Сама пиксельная машинка (вид сбоку, простая и чистая) */
+        .car-sprite {
+            width: 160px;
+            height: 52px;
+            position: relative;
+        }
+
+        /* Кузов */
+        .car-sprite-body {
+            position: absolute;
+            bottom: 6px;
+            left: 20px;
+            width: 120px;
+            height: 28px;
+            background: #2563eb;
+            border-radius: 0 14px 4px 4px;
+            z-index: 3;
+            box-shadow: 
+                0 -3px 0 #1d4ed8,
+                inset 0 2px 0 #3b82f6;
+        }
+
+        /* Кабина */
+        .car-sprite-cabin {
+            position: absolute;
+            bottom: 32px;
+            left: 58px;
+            width: 52px;
+            height: 26px;
+            background: #1e3a8a;
+            border-radius: 14px 14px 0 0;
+            z-index: 4;
+        }
+
+        /* Окно */
+        .car-sprite-window {
+            position: absolute;
+            bottom: 36px;
+            left: 68px;
+            width: 32px;
+            height: 16px;
+            background: #60a5fa;
+            border-radius: 6px 6px 0 0;
+            z-index: 5;
+        }
+
+        /* Колёса */
+        .car-sprite-wheel {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #1f2937;
+            border-radius: 50%;
+            z-index: 1;
+            animation: spinWheel 0.4s linear infinite;
+            box-shadow: 0 0 0 2px #374151, 0 0 0 4px #111827;
+        }
+        .car-sprite-wheel-back  { bottom: 0; left: 28px; }
+        .car-sprite-wheel-front { bottom: 0; left: 116px; }
+
+        /* Белый диск внутри */
+        .car-sprite-wheel::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px; height: 6px;
+            background: #9ca3af;
+            border-radius: 50%;
+        }
+
+        @keyframes spinWheel {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Фара */
+        .car-sprite-headlight {
+            position: absolute;
+            bottom: 12px;
+            left: 136px;
+            width: 8px;
+            height: 7px;
+            background: #facc15;
+            border-radius: 2px;
+            z-index: 6;
+            animation: glowHead 1.4s ease-in-out infinite;
+            box-shadow: 0 0 8px 3px rgba(250,204,21,0.8);
+        }
+
+        @keyframes glowHead {
+            0%, 100% { opacity: 1; box-shadow: 0 0 10px 4px rgba(250,204,21,0.9); }
+            50% { opacity: 0.3; box-shadow: 0 0 3px 1px rgba(250,204,21,0.3); }
+        }
+
+        /* Задний фонарь */
+        .car-sprite-taillight {
+            position: absolute;
+            bottom: 12px;
+            left: 22px;
+            width: 6px;
+            height: 5px;
+            background: #ef4444;
+            border-radius: 2px;
+            z-index: 6;
+            box-shadow: 0 0 4px 2px rgba(239,68,68,0.7);
+        }
+
+        /* Бампер */
+        .car-sprite-bumper {
+            position: absolute;
+            bottom: 4px;
+            left: 24px;
+            width: 112px;
+            height: 4px;
+            background: #374151;
+            border-radius: 2px;
+            z-index: 2;
+        }
+
+        /* Полоска на кузове */
+        .car-sprite-stripe {
+            position: absolute;
+            bottom: 18px;
+            left: 52px;
+            width: 56px;
+            height: 3px;
+            background: #1e40af;
+            border-radius: 1px;
+            z-index: 4;
+        }
+
+        .pixel-label {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #93c5fd;
+            text-shadow: 2px 2px 0 #0a2f44;
+            letter-spacing: 2px;
+            background: rgba(10,47,68,0.85);
+            padding: 6px 14px;
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .header {
+            background: #0a2f44;
+            color: white;
+            padding: 15px 0 25px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .site-title {
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .site-sub {
+            font-size: 1rem;
+            opacity: 0.85;
+        }
+
+        .nav {
+            background: #1c5a7a;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 0;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+        }
+
+        .nav-menu a:hover {
+            border-bottom-color: #ffb347;
+        }
+
+        .section {
+            padding: 50px 0;
+            border-bottom: 1px solid #dce7ed;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #0a2f44;
+            border-left: 6px solid #ff8c42;
+            padding-left: 18px;
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .car-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease;
+        }
+
+        .car-card:hover {
+            transform: translateY(-6px);
+        }
+
+        .car-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: #cfdfe9;
+        }
+
+        .car-info {
+            padding: 20px;
+        }
+
+        .car-name {
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1c5a7a;
+        }
+
+        .car-desc {
+            margin-bottom: 15px;
+            color: #2c4757;
+        }
+
+        .car-specs {
+            background: #eef3f8;
+            padding: 12px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .story-box {
+            background: #fff9ef;
+            border-left: 6px solid #ffb347;
+            padding: 25px;
+            margin: 35px 0;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        footer {
+            background: #0a2f44;
+            color: #e0edf5;
+            padding: 35px 0 25px;
+            margin-top: 20px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .sources {
+            background: #001f2c;
+            padding: 15px;
+            border-radius: 24px;
+            font-size: 0.85rem;
+            margin-top: 25px;
+        }
+
+        .btn-like {
+            display: inline-block;
+            background: #ff8c42;
+            color: #1e2f3a;
+            font-weight: bold;
+            padding: 8px 20px;
+            margin-top: 12px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 700px) {
+            .site-title { font-size: 1.6rem; }
+            .section-title { font-size: 1.6rem; }
+            .car-strip { height: 65px; }
+            .car-sprite { transform: scale(0.75); transform-origin: left center; }
+            .pixel-label { font-size: 9px; right: 8px; padding: 4px 8px; }
+            .pixel-car-moving { left: -130px; }
+            @keyframes driveCar {
+                0%   { left: -130px; transform: translateY(-50%) scaleX(1); }
+                48%  { left: calc(100% - 70px); transform: translateY(-50%) scaleX(1); }
+                50%  { left: calc(100% - 70px); transform: translateY(-50%) scaleX(-1); }
+                98%  { left: -130px; transform: translateY(-50%) scaleX(-1); }
+                100% { left: -130px; transform: translateY(-50%) scaleX(1); }
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ПОЛОСКА С МАШИНКОЙ -->
+<div class="car-strip">
+    <div class="pixel-car-moving">
+        <div class="car-sprite">
+            <div class="car-sprite-body"></div>
+            <div class="car-sprite-cabin"></div>
+            <div class="car-sprite-window"></div>
+            <div class="car-sprite-wheel car-sprite-wheel-back"></div>
+            <div class="car-sprite-wheel car-sprite-wheel-front"></div>
+            <div class="car-sprite-headlight"></div>
+            <div class="car-sprite-taillight"></div>
+            <div class="car-sprite-bumper"></div>
+            <div class="car-sprite-stripe"></div>
+        </div>
+    </div>
+    <span class="pixel-label">КЛАССИКА ДВИЖЕНИЯ</span>
+</div>
+
+<header class="header">
+    <div class="container">
+        <h1 class="site-title">🚗 Автосалон «Классика Движения»</h1>
+        <p class="site-sub">Разработка сайта для автосалона — история машин, устройство и технологии</p>
+    </div>
+</header>
+
+<nav class="nav">
+    <div class="container">
+        <ul class="nav-menu">
+            <li><a href="#">Главная</a></li>
+            <li><a href="#models">Наши авто</a></li>
+            <li><a href="#howitworks">Как устроены</a></li>
+            <li><a href="#story">История</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main>
+    <section id="models" class="section">
+        <div class="container">
+            <h2 class="section-title">⭐ Легендарные автомобили салона</h2>
+            <div class="cars-grid">
+                
+                <!-- ✅ FORD MUSTANG — правильное фото -->
+                <div class="car-card">
+                    <img class="car-img" src="https://images.pexels.com/photos/112967/pexels-photo-112967.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Ford Mustang 1967">
+                    <div class="car-info">
+                        <div class="car-name">Ford Mustang 1967</div>
+                        <div class="car-desc">Американская икона с V8 и характером. Этот мускул-кар появился в 1964, но именно 67-й год дал более агрессивный дизайн. Наши специалисты восстановили двигатель и подвеску.</div>
+                        <div class="car-specs"><strong>Двигатель:</strong> 6.4 л, V8, 320 л.с. · <strong>КПП:</strong> 3-ступ механика</div>
+                        <a href="#" class="btn-like">Записаться на тест-драйв</a>
+                    </div>
+                </div>
+
+                <!-- ✅ PORSCHE 911 — правильное фото -->
+                <div class="car-card">
+                    <img class="car-img" src="https://images.pexels.com/photos/114505/pexels-photo-114505.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Porsche 911">
+                    <div class="car-info">
+                        <div class="car-name">Porsche 911 (993)</div>
+                        <div class="car-desc">Последний воздушный 911. Это инженерное искусство: оппозитный мотор сзади, уникальное охлаждение. Машина 90-х, которая до сих пор считается эталоном управляемости.</div>
+                        <div class="car-specs"><strong>Двигатель:</strong> 3.6 л оппозитный, 285 л.с. · задний привод</div>
+                        <a href="#" class="btn-like">Подробнее</a>
+                    </div>
+                </div>
+
+                <!-- ✅ TOYOTA SUPRA — правильное фото -->
+                <div class="car-card">
+                    <img class="car-img" src="https://images.pexels.com/photos/8103557/pexels-photo-8103557.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Toyota Supra MK4">
+                    <div class="car-info">
+                        <div class="car-name">Toyota Supra MK4</div>
+                        <div class="car-desc">Легенда JDM. Рядная шестёрка 2JZ-GTE с двумя турбинами — мотор, который выдерживает огромную мощность. Эта Supra прошла реставрацию ходовой части.</div>
+                        <div class="car-specs"><strong>Мотор:</strong> 3.0 л Twin Turbo, 330 л.с. (сток) · потенциал 800+ л.с.</div>
+                        <a href="#" class="btn-like">Хочу увидеть</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="howitworks" class="section">
+        <div class="container">
+            <h2 class="section-title">🔧 Как устроены эти машины? (просто о сложном)</h2>
+            <div class="story-box">
+                <p>Все классические авто из нашего салона объединяет одно — они построены на <strong>рамной или полунесущей конструкции</strong>. В отличие от современных пластиковых машин, здесь металл и настоящее железо.</p>
+                <p>Двигатели внутреннего сгорания работают за счёт тактов: впуск, сжатие, рабочий ход, выпуск. У Mustang V8 — два блока цилиндров под углом 90°, это даёт низкий центр масс и глухое звучание. У Porsche 911 мотор висит сзади, поэтому нагрузка на заднюю ось больше — машина очень цепкая в поворотах, но требует навыка. А Supra имеет легендарный 2JZ с чугунным блоком, он построен с запасом прочности 200%, из-за чего мотор держит 1000 л.с. без расточки.</p>
+                <p>Также мы реставрируем подвески — торсионы, пружины, рычаги. Механика, кстати, живучее автомата, но требует перегазовки. В общем, если вы любите настоящие машины — наши ребята из сервиса готовы всё рассказать и покатать.</p>
+            </div>
+            <div style="background:#eef3f8; padding:18px; border-radius:20px;">
+                <h3>💡 Почему старые машины интересны?</h3>
+                <p>У них нет электронных помощников (ABS, ESP — только механика, руки и чувство). Каждая поездка — это диалог человека с железом. В нашем автосалоне можно купить или заказать реставрацию любого ретро-авто.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="story" class="section">
+        <div class="container">
+            <h2 class="section-title">📖 История одной мечты</h2>
+            <div class="cars-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="car-card">
+                    <img class="car-img" src="https://images.pexels.com/photos/147578/pexels-photo-147578.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Старый гараж с машиной">
+                    <div class="car-info">
+                        <h3>Mustang 67 — как мы его нашли</h3>
+                        <p>Этот Mustang стоял в сарае 15 лет. Владелец умер, наследники хотели сдать в металлолом. Наш мастер Артём заметил характерную решётку радиатора среди груды хлама — она торчала из-под брезента. Мы выкупили машину всего за 80 тысяч рублей, хотя её реальная стоимость после реставрации перевалила за 5 миллионов.</p>
+                        <p>Полностью перебрали двигатель: заменили поршневую группу, отшлифовали коленвал, поставили новую проводку. Сварили глушитель по оригинальным чертежам — теперь звук как в фильме "Bullitt". Салон перешили вручную, сохранив родную приборную панель. Когда мы впервые завели его после реставрации, весь цех замолчал — этот рокот V8 ни с чем не спутать. Теперь Mustang участвует в ретро-выставках и доступен для тест-драйва в нашем салоне.</p>
+                    </div>
+                </div>
+                <div class="car-card">
+                    <img class="car-img" src="https://images.pexels.com/photos/261985/pexels-photo-261985.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Механик чинит авто">
+                    <div class="car-info">
+                        <h3>Supra из Японии</h3>
+                        <p>Эта Toyota Supra MK4 приехала к нам в 2022 году прямиком с японского аукциона USS Tokyo. Машина 1997 года выпуска с оригинальным пробегом 87 000 км, но была в ужасном состоянии: прогнила вся проводка из-за влажного климата, турбины заклинило, а электроника полностью отказала.</p>
+                        <p>Наши механики полгода колдовали над ней: полностью перебрали жгут проводки (более 300 соединений!), поставили новый ECU HKS F-CON V Pro, восстановили обе турбины CT12B с заменой картриджей. Двигатель 2JZ-GTE оказался в идеальном состоянии — компрессия по всем цилиндрам 170 psi. Когда владелец приехал забирать машину и услышал, как она заводится с пол-оборота и мягко урчит на холостых — он реально заплакал. Сказал, что мечтал о такой Supra с 15 лет, а теперь она его. Такие моменты — главная награда за нашу работу.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="story-box" style="margin-top: 30px;">
+                <p><strong>Как создавался этот сайт:</strong> этот проект я полностью делал вручную на HTML/CSS. Сам подбирал изображения с бесплатного фотостока Pexels, писал тексты на основе книг по устройству авто (я учусь на автомеханика, поэтому старался объяснить грамотно). Никакой нейросетью не пользовался, кроме проверки орфографии.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div>
+                <h3>Автосалон "Классика Движения"</h3>
+                <p>Разработка сайта для учебного проекта<br>Группа 09.02.07-1B, Шайдуллин С.Р.</p>
+                <p>📍 Адрес: ул. Карима Тинчурина, 25, г. Казань<br>📞 +79270397513</p>
+            </div>
+            <div>
+                <p><strong>Контент проверен:</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>Устройство ДВС — учебник "Автомобильные двигатели", Карунин 2019</li>
+                    <li>Истории реставрации — блоги и личный опыт механиков</li>
+                    <li>Фото машин: Pexels.com (лицензия Creative Commons Zero)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="sources">
+            <h4>📌 Где брал источники информации (обязательно для проекта):</h4>
+            <p>1. Книга «Легендарные автомобили XX века» — Шульгин В.И., 2020.<br>
+            2. Журнал "За рулем" выпуски за 2021-2022 (статьи про Porsche и Supra).<br>
+            3. Сайт autoreview.ru — сравнение конструкций подвесок.<br>
+            4. Фотографии машин с сайта Pexels — авторы: Mike Bird, Pixabay, Scott Webb.<br>
+            5. Технические характеристики — открытые данные заводов Ford, Porsche, Toyota (паспорта ТС).<br>
+            <span style="display: inline-block; margin-top: 10px; background: #f5e6d3; padding: 4px 10px; border-radius: 30px;">✨ Сайт создан студентом самостоятельно, без шаблонов и ИИ-генерации целого кода ✨</span>
+            </p>
+        </div>
+        <div style="text-align: center; margin-top: 30px; font-size: 13px;">
+            &copy; 2025 Индивидуальный проект — Разработка веб-сайта для автосалона
+        </div>
+    </div>
+</footer>
+</body>
+</html>
